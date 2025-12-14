@@ -7,6 +7,7 @@ let routeLines = new Map();
 let routeCache = new Map();
 let refreshInterval = null;
 let isEnabled = false;
+let routeLinesEnabled = true;
 let config = null;
 
 const TYPE_MAP = {
@@ -97,10 +98,10 @@ const getShapeName = (type, category) => {
 
 const getAltitudeColor = (altitude) => {
     if (altitude == null || altitude === 'ground') return '#ffa500';
-    
+
     const alt = typeof altitude === 'string' ? parseInt(altitude, 10) : altitude;
     if (isNaN(alt)) return '#ffa500';
-    
+
     const stops = [
         { alt: 0,     r: 255, g: 255, b: 0   },
         { alt: 2000,  r: 128, g: 255, b: 0   },
@@ -110,13 +111,13 @@ const getAltitudeColor = (altitude) => {
         { alt: 40000, r: 128, g: 0,   b: 255 },
         { alt: 50000, r: 255, g: 0,   b: 255 },
     ];
-    
+
     if (alt <= stops[0].alt) return `rgb(${stops[0].r},${stops[0].g},${stops[0].b})`;
     if (alt >= stops[stops.length - 1].alt) {
         const s = stops[stops.length - 1];
         return `rgb(${s.r},${s.g},${s.b})`;
     }
-    
+
     for (let i = 0; i < stops.length - 1; i++) {
         if (alt >= stops[i].alt && alt < stops[i + 1].alt) {
             const t = (alt - stops[i].alt) / (stops[i + 1].alt - stops[i].alt);
@@ -126,7 +127,7 @@ const getAltitudeColor = (altitude) => {
             return `rgb(${r},${g},${b})`;
         }
     }
-    
+
     return '#ffa500';
 };
 
@@ -134,34 +135,34 @@ const createAircraftIcon = (heading = 0, altitude = null, type = null, category 
     const color = getAltitudeColor(altitude);
     const shapeName = getShapeName(type, category);
     const shape = shapes[shapeName] || shapes['jet_swept'];
-    
+
     const w = shape.w || 32;
     const h = shape.h || 32;
     const viewBox = shape.viewBox || `0 0 ${w} ${h}`;
     const strokeScale = shape.strokeScale || 1;
     const strokeWidth = 0.7 * strokeScale;
-    
+
     const vbParts = viewBox.split(' ').map(Number);
     const cx = vbParts[0] + vbParts[2] / 2;
     const cy = vbParts[1] + vbParts[3] / 2;
-    
+
     let pathContent = '';
     if (Array.isArray(shape.path)) {
         pathContent = shape.path.map(p => `<path d="${p}"/>`).join('');
     } else {
         pathContent = `<path d="${shape.path}"/>`;
     }
-    
+
     const scale = 40 / Math.max(w, h);
     const iconW = Math.round(w * scale);
     const iconH = Math.round(h * scale);
-    
+
     const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" width="${iconW}" height="${iconH}">
         <g transform="rotate(${heading}, ${cx}, ${cy})" fill="${color}" stroke="#000" stroke-width="${strokeWidth}">
             ${pathContent}
         </g>
     </svg>`;
-    
+
     return L.divIcon({
         className: 'aircraft-icon',
         html: svg,
@@ -176,14 +177,14 @@ const formatAircraftPopup = (ac, routeInfo = null) => {
     const type = ac.t || '—';
     const desc = ac.desc || '';
     const operator = ac.ownOp || '';
-    
-    const alt = ac.alt_baro === 'ground' ? 'Ground' : 
+
+    const alt = ac.alt_baro === 'ground' ? 'Ground' :
                 ac.alt_baro ? `${ac.alt_baro.toLocaleString()} ft` : '—';
     const speed = ac.gs ? `${Math.round(ac.gs)} kts` : '—';
     const vrate = ac.baro_rate ? `${ac.baro_rate > 0 ? '+' : ''}${ac.baro_rate.toLocaleString()} ft/m` : '';
     const heading = ac.track != null ? `${Math.round(ac.track)}°` : '—';
     const squawk = ac.squawk || '';
-    
+
     let routeStr = '';
     if (routeInfo?._airport_codes_iata) {
         const [dep, arr] = routeInfo._airport_codes_iata.split('-');
@@ -194,12 +195,12 @@ const formatAircraftPopup = (ac, routeInfo = null) => {
             routeStr = `<div class="ac-route">Private/Not Known</div>`;
         }
     }
-    
-    const squawkClass = squawk === '7700' ? 'squawk-emergency' : 
+
+    const squawkClass = squawk === '7700' ? 'squawk-emergency' :
                         squawk === '7600' ? 'squawk-radio' :
                         squawk === '7500' ? 'squawk-hijack' : '';
     const squawkStr = squawk ? `<span class="ac-squawk ${squawkClass}">${squawk}</span>` : '';
-    
+
     return `<div class="ac-popup">
         <div class="ac-header">
             <span class="ac-callsign">${callsign}</span>
@@ -239,20 +240,20 @@ const fetchRoutes = async (aircraft) => {
             lat: ac.lat,
             lng: ac.lon
         }));
-    
+
     if (planes.length === 0) return;
-    
+
     try {
         const response = await fetch('/api/aircraft/routes', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ planes })
         });
-        
+
         if (!response.ok) return;
-        
+
         const data = await response.json();
-        
+
         for (const route of data) {
             if (route.callsign && route._airports) {
                 routeCache.set(route.callsign, route);
@@ -264,25 +265,24 @@ const fetchRoutes = async (aircraft) => {
 };
 
 const drawRoute = (ac, routeInfo) => {
-    return;
     const id = ac.hex;
-    
+
     if (routeLines.has(id)) {
         routeLayer.removeLayer(routeLines.get(id));
         routeLines.delete(id);
     }
-    
+
     if (!routeInfo?._airports || routeInfo._airports.length < 2) return;
-    
+
     const coords = routeInfo._airports.map(a => [a.lat, a.lon]);
-    
+
     const line = L.polyline(coords, {
         color: getAltitudeColor(ac.alt_baro),
         weight: 2,
         opacity: 0.6,
-        dashArray: '5, 10'
+        dashArray: '1,1'
     });
-    
+
     routeLayer.addLayer(line);
     routeLines.set(id, line);
 };
@@ -290,62 +290,62 @@ const drawRoute = (ac, routeInfo) => {
 const renderAircraft = async () => {
     const map = getMap();
     if (!map || !aircraftLayer || !isEnabled) return;
-    
+
     const bounds = map.getBounds();
     const aircraft = await fetchAircraft();
     const seen = new Set();
-    
+
     const inViewAircraft = aircraft.filter(ac => ac.lat && ac.lon && bounds.contains([ac.lat, ac.lon]));
     await fetchRoutes(inViewAircraft);
-    
+
     for (const ac of aircraft) {
         if (!ac.lat || !ac.lon) continue;
-        
+
         const id = ac.hex;
         const callsign = ac.flight?.trim();
         seen.add(id);
-        
+
         const inView = bounds.contains([ac.lat, ac.lon]);
         const existing = aircraftMarkers.get(id);
         const routeInfo = callsign ? routeCache.get(callsign) : null;
-        
+
         if (inView) {
             const heading = ac.track || ac.true_heading || 0;
             const altitude = ac.alt_baro;
             const type = ac.t || null;
             const category = ac.category || null;
-            
+
             if (existing) {
                 existing.setLatLng([ac.lat, ac.lon]);
                 existing.setIcon(createAircraftIcon(heading, altitude, type, category));
                 existing.setPopupContent(formatAircraftPopup(ac, routeInfo));
             } else {
-                const marker = L.marker([ac.lat, ac.lon], { 
+                const marker = L.marker([ac.lat, ac.lon], {
                     icon: createAircraftIcon(heading, altitude, type, category),
                     zIndexOffset: 1000
                 }).bindPopup(formatAircraftPopup(ac, routeInfo));
-                
-                marker.on('click', () => drawRoute(ac, routeInfo));
-                
+
+                marker.on('click', () => if (routeLinesEnabled) drawRoute(ac, routeInfo));
+
                 aircraftLayer.addLayer(marker);
                 aircraftMarkers.set(id, marker);
             }
         } else if (existing) {
             aircraftLayer.removeLayer(existing);
             aircraftMarkers.delete(id);
-            
+
             if (routeLines.has(id)) {
                 routeLayer.removeLayer(routeLines.get(id));
                 routeLines.delete(id);
             }
         }
     }
-    
+
     for (const [id, marker] of aircraftMarkers) {
         if (!seen.has(id)) {
             aircraftLayer.removeLayer(marker);
             aircraftMarkers.delete(id);
-            
+
             if (routeLines.has(id)) {
                 routeLayer.removeLayer(routeLines.get(id));
                 routeLines.delete(id);
@@ -376,7 +376,7 @@ const clearLayers = () => {
 
 export const setAircraftEnabled = (enabled) => {
     if (!config?.aircraft_url) return;
-    
+
     isEnabled = enabled;
     if (enabled) {
         startRefresh();
@@ -388,7 +388,7 @@ export const setAircraftEnabled = (enabled) => {
 
 export const toggleAircraft = () => {
     if (!config?.aircraft_url) return false;
-    
+
     setAircraftEnabled(!isEnabled);
     return isEnabled;
 };
@@ -402,7 +402,7 @@ export const initAircraft = (cfg) => {
     const map = getMap();
     routeLayer = L.layerGroup().addTo(map);
     aircraftLayer = L.layerGroup().addTo(map);
-    
+
     document.addEventListener('visibilitychange', () => {
         if (!isEnabled) return;
         if (document.hidden) {
