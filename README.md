@@ -17,74 +17,6 @@ to produce a near real-time map.
 - Optional live aircraft overlay (you'll need a source of ADSB data)
 - Distinct icons courtesy of tar1090, and aircraft route data from ADSB.lol
 
-## Can I use it?
-Sure! 
-- You'll need a BODS API Key. Register for one at [https://data.bus-data.dft.gov.uk/account/signup/](https://data.bus-data.dft.gov.uk/account/signup/).
-- You may want a Tailscale API key, which you can create in your admin panel. Make sure it's good for repeated use.
-
-### Cap Captcha
-You may want to set a Cap key, to limit use of your BODS API key: 
-1. Launch in docker with `docker compose --profile public up -d --build`
-2. Open http://localhost:3000 in browser
-3. Log in with the admin key (default: `changeme`, or whatever you set `CAP_ADMIN_KEY` to in `.env`)
-4. Click "Create Site Key" in the dashboard
-5. Copy the **Key ID** and **Secret** it generates
-6. Add to `.env`:
-```
-   CAP_KEY_ID=<the key id>
-   CAP_KEY_SECRET=<the secret>
-   CAP_URL=http://cap:3000
-   CAP_PUBLIC_URL=http://<your-tailscale-hostname>:3000 
-```
-### OSRM (Optional)
-You may want an OSRM instance, for routing. First you need to preprocess the map data (one-time, ~30min for UK).
-Make a `docker-compose.yml` file:
-
-```yaml
- # You will want this *not* on an RPi, at least not yet.
- osrm:
-   image: osrm/osrm-backend
-   container_name: osrm
-   restart: unless-stopped
-   ports:
-     - "5001:5000"
-   volumes:
-     - osrm-data:/data
-   command: osrm-routed --algorithm mld /data/great-britain-latest.osrm
-```
-Then, alongside that file, make a folder and prepare the container:
-
-`mkdir -p osrm-data && cd osrm-data`
-
-`wget https://download.geofabrik.de/europe/great-britain-latest.osm.pbf`
-
-`docker run -t -v $(pwd):/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/great-britain-latest.osm.pbf`
-
-`docker run -t -v $(pwd):/data osrm/osrm-backend osrm-partition /data/great-britain-latest.osrm`
-
-`docker run -t -v $(pwd):/data osrm/osrm-backend osrm-customize /data/great-britain-latest.osrm`
-
-`docker compose up -d` should now start the container.
-
-To test it:
-`curl localhost:5001/5001/route/v1/driving/-0.0877,51.5079;-0.0900,51.5100?geometries=geojson"`
-
-Should give you something like:
-```json 
-{"code":"Ok","routes":[{"geometry":{"coordinates":[[-0.087641,51.507892],[-0.088322,51.506128],[-0.089951,51.504807],...
-```
-
-In the primary `docker-compose.yml`, `extra-hosts` needs `mitre:10.0.0.120` swapping to wherever you are hosting OSRM,
-to allow the container to communicate with it.
-
-### Environment
-Now, set up the variables in .env.example (as .env)
-
-### Run
-Launch in Docker with `docker compose up -d --build` for local access only,
-or `docker compose --profile public up -d --build` to include Tailscale and Cap
-for public access.
-
 # How? Why?
 I'm just a sucker for visualising real-time data that reflects the real world.
 I've long thought about it, but finally put some time in to make a cool thing, I guess!
@@ -148,3 +80,70 @@ Feel free to contact me if needed.
 | Leaflet.markercluster | 1.5.3 | MIT | [Link](https://github.com/Leaflet/Leaflet.markercluster/blob/master/MIT-LICENSE.txt) |
 | tar1090 markers.js | N/A | GPL v2 or later | [Link](https://github.com/wiedehopf/tar1090/blob/master/LICENSE) |
 | Cap.js | N/A | Apache-2.0 | [Link](https://github.com/CosmicDustTinCan/capjs) |
+
+## Can I use it myself?
+Sure! 
+- You'll need a BODS API Key. Register for one at [https://data.bus-data.dft.gov.uk/account/signup/](https://data.bus-data.dft.gov.uk/account/signup/).
+- You may want a Tailscale API key, which you can create in your admin panel. Make sure it's good for repeated use.
+
+### Cap Captcha
+You may want to set a Cap key, to limit use of your BODS API key: 
+1. Launch in docker with `docker compose --profile public up -d --build`
+2. Open http://localhost:3000 in browser
+3. Log in with the admin key (default: `changeme`, or whatever you set `CAP_ADMIN_KEY` to in `.env`)
+4. Click "Create Site Key" in the dashboard
+5. Copy the **Key ID** and **Secret** it generates
+6. Add to `.env`:
+```
+   CAP_KEY_ID=<the key id>
+   CAP_KEY_SECRET=<the secret>
+   CAP_URL=http://cap:3000
+   CAP_PUBLIC_URL=http://<your-tailscale-hostname>:3000 
+```
+### OSRM (Optional)
+You may want an OSRM instance, for routing. First you need to preprocess the map data (one-time, ~30min for UK).
+Make a `docker-compose.yml` file:
+
+```yaml
+ # You will want this *not* on an RPi, at least not yet.
+ osrm:
+   image: osrm/osrm-backend
+   container_name: osrm
+   restart: unless-stopped
+   ports:
+     - "5001:5000"
+   volumes:
+     - osrm-data:/data
+   command: osrm-routed --algorithm mld /data/great-britain-latest.osrm
+```
+Then, alongside that file, make a folder and prepare the container:
+
+```bash
+mkdir -p osrm-data && cd osrm-data`
+wget https://download.geofabrik.de/europe/great-britain-latest.osm.pbf`
+docker run -t -v $(pwd):/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/great-britain-latest.osm.pbf`
+docker run -t -v $(pwd):/data osrm/osrm-backend osrm-partition /data/great-britain-latest.osrm`
+docker run -t -v $(pwd):/data osrm/osrm-backend osrm-customize /data/great-britain-latest.osrm`
+```
+
+`docker compose up -d` should now start the container.
+
+To test it:
+`curl localhost:5001/5001/route/v1/driving/-0.0877,51.5079;-0.0900,51.5100?geometries=geojson"`
+
+Should give you something like:
+```json 
+{"code":"Ok","routes":[{"geometry":{"coordinates":[[-0.087641,51.507892],[-0.088322,51.506128],[-0.089951,51.504807],...
+```
+
+In the primary `docker-compose.yml`, `extra-hosts` needs `mitre:10.0.0.120` swapping to wherever you are hosting OSRM,
+to allow the container to communicate with it.
+
+### Environment
+Now, set up the variables in .env.example (as .env)
+
+### Run
+Launch in Docker with `docker compose up -d --build` for local access only,
+or `docker compose --profile public up -d --build` to include Tailscale and Cap
+for public access.
+
