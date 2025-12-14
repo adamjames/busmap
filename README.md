@@ -58,7 +58,7 @@ Relevant licence information has been collated below on a best-effort basis.
 Feel free to contact me if needed.
 
 # Third-party projects & commercial services
-| Name | Service Type | Licence | Licence URL |
+| Name | Service Type | Licence | URL |
 |------|-------------|---------|------------|
 | OpenStreetMap Routing Machine (OSRM) | Routing Engine | BSD 2-Clause | [Link](https://github.com/Project-OSRM/osrm-backend) / [Image](https://github.com/project-osrm/osrm-backend/pkgs/container/osrm-backend) |
 | Cap Standalone | CAPTCHA Engine (Back-end) | Apache-2.0 | [Docs](https://capjs.js.org/guide/standalone/) / [Github](https://github.com/tiagozip/cap) |
