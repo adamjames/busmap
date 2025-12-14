@@ -91,7 +91,7 @@ Sure!
 - You may want a Tailscale API key, which you can create in your admin panel. Make sure it's good for repeated use.
 
 ### Cap Captcha
-You may want to set a Cap key, to limit use of your BODS API key: 
+You may want to set a Cap key, to (somewhat, maybe) protect against use of your BODS API key by bots: 
 1. Launch in docker with `docker compose --profile public up -d --build`
 2. Open http://localhost:3000 in browser
 3. Log in with the admin key (default: `changeme`, or whatever you set `CAP_ADMIN_KEY` to in `.env`)
