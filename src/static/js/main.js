@@ -296,6 +296,10 @@ export const init = (config) => {
     document.getElementById('welcome-dismiss')?.addEventListener('click', () => {
         document.getElementById('welcome-modal').style.display = 'none';
         loadCapScript(config);
+         setCurrentBounds(map.getBounds());
+         setCurrentZoom(Math.floor(map.getZoom()));
+         debouncedUpdate(config);
+         updateVisibility();
     });
 
     document.getElementById('refresh-btn')?.addEventListener('click', () => updateBuses(config));
