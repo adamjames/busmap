@@ -152,7 +152,7 @@ const createAircraftIcon = (heading = 0, altitude = null, type = null, category 
         pathContent = `<path d="${shape.path}"/>`;
     }
     
-    const scale = 28 / Math.max(w, h);
+    const scale = 40 / Math.max(w, h);
     const iconW = Math.round(w * scale);
     const iconH = Math.round(h * scale);
     
