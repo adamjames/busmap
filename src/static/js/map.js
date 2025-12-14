@@ -153,9 +153,22 @@ export const renderVehicles = async (vehicles, bounds) => {
                     const newMarker = L.marker([v.latitude, v.longitude], { icon: createBusIcon(v.operator) })
                         .bindPopup(formatPopup(v))
                     newMarker._animationPaused = false;
+                    newMarker._popupOpen = false;
 
                     newMarker.on('mouseover', () => { newMarker._animationPaused = true; });
-                    newMarker.on('mouseout', () => { newMarker._animationPaused = false; });
+                    newMarker.on('mouseout', () => {
+                        if (!newMarker._popupOpen) {
+                            newMarker._animationPaused = false;
+                        }
+                    });
+                    newMarker.on('popupopen', () => {
+                        newMarker._popupOpen = true;
+                        newMarker._animationPaused = true;
+                    });
+                    newMarker.on('popupclose', () => {
+                        newMarker._popupOpen = false;
+                        newMarker._animationPaused = false;
+                    });
 
                     busMarkers.addLayer(newMarker);
                     visibleMarkers.set(id, newMarker);
