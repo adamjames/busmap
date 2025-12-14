@@ -1,6 +1,6 @@
 # Bus Tracker
 
-This project uses data from the UK Government's [Bus Open Data Service (BODS)](https://data.bus-data.dft.gov.uk/)
+This project uses data from UK [Bus Open Data Service (BODS)](https://data.bus-data.dft.gov.uk/)
 to produce a near real-time map. 
 
 ![A screenshot at ground level, showing buses](./media/screenshot-ground.jpg)
