@@ -1,0 +1,75 @@
+.ac-popup {
+    min-width: 180px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+.ac-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+}
+.ac-callsign {
+    font-size: 16px;
+    font-weight: 700;
+    font-family: monospace;
+}
+.ac-squawk {
+    font-family: monospace;
+    font-size: 11px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: #e0e0e0;
+}
+.ac-squawk.squawk-emergency { background: #ff4444; color: #fff; }
+.ac-squawk.squawk-radio { background: #ff9800; color: #fff; }
+.ac-squawk.squawk-hijack { background: #f44; color: #fff; animation: blink 0.5s infinite; }
+@keyframes blink { 50% { opacity: 0.5; } }
+.ac-reg {
+    font-family: monospace;
+    color: #666;
+    font-size: 12px;
+}
+.ac-desc {
+    color: #333;
+    margin: 4px 0;
+}
+.ac-operator {
+    color: #0066cc;
+    font-size: 12px;
+}
+.ac-route {
+    background: #f0f7ff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin: 6px 0;
+    font-weight: 500;
+    text-align: center;
+}
+.ac-data {
+    width: 100%;
+    margin: 8px 0;
+    border-collapse: collapse;
+}
+.ac-data td {
+    padding: 2px 0;
+}
+.ac-data td:first-child {
+    color: #888;
+    width: 70px;
+}
+.ac-data td:last-child {
+    font-family: monospace;
+    text-align: right;
+}
+.ac-vrate {
+    font-size: 11px;
+    color: #888;
+}
+.ac-hex {
+    font-family: monospace;
+    font-size: 10px;
+    color: #aaa;
+    text-align: right;
+    margin-top: 4px;
+}

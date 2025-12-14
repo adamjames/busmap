@@ -1,0 +1,48 @@
+services:
+  bus-tracker:
+    build: .
+    container_name: bus-tracker
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    extra_hosts:
+      - "mitre:10.0.0.120"
+    env_file:
+      - .env
+
+  cap:
+    image: tiago2/cap:latest
+    container_name: cap-standalone
+    restart: unless-stopped
+    profiles:
+      - public
+    ports:
+      - "3000:3000"
+    volumes:
+      - cap-data:/usr/src/app/.data
+    environment:
+      - ADMIN_KEY=${CAP_ADMIN_KEY:-YouShouldDefinitelyChangeThis45!}
+
+  tailscale:
+    image: tailscale/tailscale:latest
+    container_name: bus-tracker-ts
+    hostname: busmap
+    restart: unless-stopped
+    profiles:
+      - public
+    environment:
+      - TS_AUTHKEY=${TS_AUTHKEY}
+      - TS_STATE_DIR=/var/lib/tailscale
+#      - TS_EXTRA_ARGS=--advertise-tags=tag:container
+      - TS_SERVE_CONFIG=/config/serve.json
+    volumes:
+      - tailscale-state:/var/lib/tailscale
+      - ./serve.json:/config/serve.json:ro
+      - /dev/net/tun:/dev/net/tun
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+
+volumes:
+  cap-data:
+  tailscale-state:

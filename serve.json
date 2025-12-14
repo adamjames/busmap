@@ -1,0 +1,22 @@
+{
+  "TCP": {
+    "443": { "HTTPS": true },
+    "8443": { "HTTPS": true }
+  },
+  "Web": {
+    "busmap.tail5c8e3.ts.net:443": {
+      "Handlers": {
+        "/": { "Proxy": "http://bus-tracker:5000" }
+      }
+    },
+    "busmap.tail5c8e3.ts.net:8443": {
+      "Handlers": {
+        "/": { "Proxy": "http://cap:3000" }
+      }
+    }
+  },
+  "AllowFunnel": {
+    "busmap.tail5c8e3.ts.net:443": true,
+    "busmap.tail5c8e3.ts.net:8443": true
+  }
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bus Tracker</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚌</text></svg>">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/aircraft.css') }}">
+</head>
+<body>
+    <div id="map"></div>
+    
+    <div class="info-panel" role="status" aria-live="polite">
+        <button id="top-panel-minimize" title="Minimize">−</button>
+        <h3>🚌 Bus Tracker</h3>
+        <div class="stat-row">
+            <span class="stat-label">Buses</span>
+            <span class="stat-value" id="stats">-</span>
+        </div>
+        <div class="stat-row">
+            <span class="stat-label">Global Requests Left (Hourly)</span> 
+            <span class="stat-value" id="rate-remaining">-</span>
+        </div>
+        
+        <div id="last-update">Waiting for data...</div>
+        
+        <div class="btn-row">
+            <button id="refresh-btn" type="button">
+                <span class="spinner"></span>
+                <span class="btn-text">Refresh</span>
+            </button>
+            <button id="find-me-btn">📍 Find Me</button>
+               <label>
+                   <input type="checkbox" id="follow-toggle">
+                   Follow
+               </label>
+            </button>
+            <label>
+               <input type="checkbox" id="orient-toggle">
+                   Orient
+            </label>
+        </div>
+        <div class="link-row">
+            <button id="whats-new-btn" type="button">What's New</button>
+        </div>
+    </div>
+
+    <div id="info-popup" class="info-popup" style="display: none;">
+        <div class="info-popup-content">
+            <p id="info-popup-message"></p>
+            <div class="info-popup-buttons">
+                <button id="info-popup-dismiss">Pff, nerd</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="error-toast" class="error-toast" role="alert"></div>
+    
+    <div class="log-panel">
+        <div class="log-header">
+            <span>API Log</span>
+            <div class="log-controls">
+                <button id="log-minimize" type="button" title="Minimize">−</button>
+                <label class="override-toggle" title="Ignore zoom restriction">
+                </label>
+                {% if config.allow_override %}
+                <label class="override-toggle" title="Ignore zoom restriction">
+                   <input type="checkbox" id="zoom-override">
+                   <span>Override</span>
+                </label>
+                <button id="force-fetch-btn" type="button">Fetch</button>
+                {% endif %}
+            </div>
+        </div>
+        <div id="log-entries"></div>
+    </div>
+
+
+    <div id="welcome-modal" class="welcome-modal">
+      <div class="welcome-modal-content">
+         <div class="modal-scroll">
+            <h3>Welcome to Bus Tracker</h3>
+            <p>The bus map relies on a free <a href="https://data.bus-data.dft.gov.uk/" target="_blank">Department for Transport API</a> and key. Support for bringing your own is coming.</p>
+            <p>I've done what I can to manage usage of the shared key, but there are no guarantees. This map may go down at any time.</p>
+            <p>Please be nice, and let me know if you find something wrong :) Don't forget to check out <strong>What's New</strong> for the latest updates!</p>
+            <button id="welcome-dismiss">Got it!</button>
+         </div>
+       </div>
+    </div>
+
+    <div id="whats-new-modal" class="welcome-modal" style="display: none;">
+      <div class="welcome-modal-content">
+        <div class="modal-scroll">
+            <h3>What's New</h3>
+            <h4>🛣️ Road Routing</h4>
+            <p>Buses can now follow roads realistically when they move; thanks to the integration of <a href="https://project-osrm.org/" target="_blank">OpenStreetMap routing</a>. It's even (like the map itself) entirely self-hosted!</p>
+            <p>Like all great magic tricks, this is a little bit of smoke and mirrors. The routing is based on cars, not buses - so it's okay if you see a bus squeeze down a side street. Just don't try to follow it.</p>
+            <p>It works by using the OSM database to plan a road route from the current latitude and longitude to the new one. The travel time is based on the route, with waypoints and interpolation used to make everything pretty.</p>
+            <p>It works especially well on larger roundabouts, where the speed and direction of travel should look much more plausible.</p>
+            <p>As a bonus, the clever maths used for the routed movements has also been used to improve non-routed movement.</p>
+            </ul>
+            <p><strong>Just one more thing...</strong><p>
+            <p>There's a final secret in this version, see if you can find it.</p>
+            <button id="whats-new-dismiss">Nice!</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="cap-modal" class="cap-modal" style="display: none;">
+        <div class="cap-modal-content">
+            <h3>Now then, got a loicence for that?</h3>
+            <p id="cap-message"/>
+            <div id="cap-widget-container"></div>
+            <div id="cap-status" class="cap-status"></div>
+        </div>
+    </div>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+    <script src="{{ url_for('static', filename='js/markers.js') }}"></script>
+    <script type="module">
+        import { init } from '{{ url_for("static", filename="js/main.js") }}';
+        const CONFIG = {{ config | tojson }};
+        init(CONFIG);
+    </script>
+  </body>
+</html>
+
