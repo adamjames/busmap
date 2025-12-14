@@ -47,9 +47,10 @@ Feel free to contact me if needed.
 
 # Third-party projects & Commercial services
 
-| Name | Service Type | Licence | Licence URL | ------|---------|--------|------------|
+| Name | Service Type | Licence | Licence URL |
+|------|-------------|---------|------------|
 | OpenStreetMap Routing Machine (OSRM) | Routing Engine | BSD 2-Clause | [Link](https://github.com/Project-OSRM/osrm-backend) / [Image](https://github.com/project-osrm/osrm-backend/pkgs/container/osrm-backend) |
-| Cap Standalone | CAPTCHA Engine (Back-end) | Apache-2.0 | [Docs](https://capjs.js.org/guide/standalone/) / [Github](https://github.com/tiagozip/cap)
+| Cap Standalone | CAPTCHA Engine (Back-end) | Apache-2.0 | [Docs](https://capjs.js.org/guide/standalone/) / [Github](https://github.com/tiagozip/cap) |
 | Tailscale | VPN Service | Mixed (Client: BSD 3-Clause, Service: Commercial) | [Open Source](https://tailscale.com/opensource) / [Client](https://github.com/tailscale/tailscale) |
 | tar1090 | Aircraft Tracking Visualisation | GPL v2 or later | [Github](https://github.com/wiedehopf/tar1090) |
 | ADS-B.im | Probably the easiest turnkey RTLSDR-ADSB feeder around | - | [Website](https://globe.adsb.im/) |
