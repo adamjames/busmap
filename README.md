@@ -1,21 +1,22 @@
 # Bus Tracker
 
 This project uses data from UK [Bus Open Data Service (BODS)](https://data.bus-data.dft.gov.uk/)
-to produce a near real-time map. 
+to produce a near real-time map with on-road routing. Because I also [track aircraft](adamjames.me), 
+I added those in too. Look up!
 
 ![A screenshot at ground level, showing buses](./media/screenshot-ground.jpg)
 
 ## Features
 - Near-real time bus map covering the UK.
+- Optional street-level routing predictions based on OpenStreetMap data (via secondary container.)
+- Optional live aircraft overlay (you'll need a source of ADSB data)
+- Distinct icons courtesy of tar1090, and aircraft route data from ADSB.lol
 - Client behaviour adjustment based on zoom level & vehicle volume. Geolocation, following, orientation.
 - Early affordances for small screens, like the ability to minimise UI elements.
 - Client-level and global rate limits to discourage malicious use.
 - Back-end API gateway for BODS/OSRM/ADSB/Cap requests, for protection of sensitive data.
 - Hosting in Docker via Tailscale Funnel, to make deployment on commodity hardware easy.
 - .env environment configuration (mostly - some internal stuff still needs cleaning up!)
-- Optional street-level routing predictions based on OpenStreetMap data (via secondary container.)
-- Optional live aircraft overlay (you'll need a source of ADSB data)
-- Distinct icons courtesy of tar1090, and aircraft route data from ADSB.lol
 
 # How? Why?
 I'm just a sucker for visualising real-time data that reflects the real world.
