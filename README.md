@@ -1,13 +1,4 @@
 # Bus Tracker
-
-This project uses data from UK [Bus Open Data Service (BODS)](https://data.bus-data.dft.gov.uk/)
-to produce a near real-time map. The raw API provides point-to-point updates. Self-hosted OpenStreetMap
-integration enhances this with street-level routing, animated through linear interpolation.
-
-I also [track aircraft](https://www.adamjames.me), so I added those in too. Look up!
-
-An instance of this application is (sometimes) live at [https://busmap.tail5c8e3.ts.net/](https://busmap.tail5c8e3.ts.net/).
-
 ![A screenshot at ground level, showing buses](./media/screenshot-ground.jpg)
 
 ## Features
@@ -21,6 +12,14 @@ An instance of this application is (sometimes) live at [https://busmap.tail5c8e3
 - Back-end API gateway for BODS/OSRM/ADSB/Cap requests, for protection of sensitive data.
 - Hosting in Docker via Tailscale Funnel, to make deployment on commodity hardware easy.
 - .env environment configuration (mostly - some internal stuff still needs cleaning up!)
+
+This project uses data from UK [Bus Open Data Service (BODS)](https://data.bus-data.dft.gov.uk/)
+to produce a near real-time map. The raw API provides point-to-point updates. Self-hosted OpenStreetMap
+integration enhances this with street-level routing, animated through linear interpolation.
+
+I also [track aircraft](https://www.adamjames.me), so I added those in too. Look up!
+
+An instance of this application is (sometimes) live at [https://busmap.tail5c8e3.ts.net/](https://busmap.tail5c8e3.ts.net/).
 
 # How? Why?
 I'm just a sucker for visualising real-time data that reflects the real world.
