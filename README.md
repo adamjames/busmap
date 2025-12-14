@@ -1,4 +1,4 @@
-# Real-time UK Bus Map 
+# UK Bus Map 
 ![A screenshot at ground level, showing buses](./media/screenshot-ground.jpg)
 
 ## Features
