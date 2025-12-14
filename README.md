@@ -123,11 +123,11 @@ Make a `docker-compose.yml` file:
 Then, alongside that file, make a folder and prepare the container:
 
 ```bash
-   mkdir -p osrm-data && cd osrm-data`
-   wget https://download.geofabrik.de/europe/great-britain-latest.osm.pbf`
-   docker run -t -v $(pwd):/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/great-britain-latest.osm.pbf`
-   docker run -t -v $(pwd):/data osrm/osrm-backend osrm-partition /data/great-britain-latest.osrm`
-   docker run -t -v $(pwd):/data osrm/osrm-backend osrm-customize /data/great-britain-latest.osrm`
+   mkdir -p osrm-data && cd osrm-data
+   wget https://download.geofabrik.de/europe/great-britain-latest.osm.pbf
+   docker run -t -v $(pwd):/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/great-britain-latest.osm.pbf
+   docker run -t -v $(pwd):/data osrm/osrm-backend osrm-partition /data/great-britain-latest.osrm
+   docker run -t -v $(pwd):/data osrm/osrm-backend osrm-customize /data/great-britain-latest.osrm
 ```
 
 `docker compose up -d` should now start the container.
@@ -137,7 +137,7 @@ To test it:
 
 Should give you something like:
 ```json 
-   {"code":"Ok","routes":[{"geometry":{"coordinates":[[-0.087641,51.507892],[-0.088322,51.506128],[-0.089951,51.504807],...
+   {"code":"Ok","routes":[{"geometry":{"coordinates":[[-0.087641,51.507892],[-0.088322,51.506128],[-0.089951,51.504807],<snip>
 ```
 
 In the primary `docker-compose.yml`, `extra-hosts` needs `mitre:10.0.0.120` swapping to wherever you are hosting OSRM,
