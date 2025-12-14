@@ -1,8 +1,10 @@
 # Bus Tracker
 
 This project uses data from UK [Bus Open Data Service (BODS)](https://data.bus-data.dft.gov.uk/)
-to produce a near real-time map with on-road routing. Because I also [track aircraft](https://www.adamjames.me), 
-I added those in too. Look up!
+to produce a near real-time map. The raw API provides point-to-point updates. Self-hosted OpenStreetMap
+integration enhances this with street-level routing, animated through linear interpolation.
+
+I also [track aircraft](https://www.adamjames.me), so I added those in too. Look up!
 
 An instance of this application is (sometimes) live at [https://busmap.tail5c8e3.ts.net/](https://busmap.tail5c8e3.ts.net/).
 
