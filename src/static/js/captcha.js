@@ -41,7 +41,7 @@ export const showCapModal = (config, reason = 'session') => {
         if (reason === 'usage') {
             message.textContent = "What are you, some sort of Map Man? Don't forget to zoom back in a little when you're done gawking, okay? Thanks! <3";
         } else {
-            message.textContent = "Sorry for the speedbump, but there's a lot of robots...";
+            message.textContent = "Sorry for the speedbump...";
         }
 
         const widget = document.createElement('cap-widget');

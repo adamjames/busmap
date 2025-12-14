@@ -264,6 +264,14 @@ const fetchRoutes = async (aircraft) => {
     }
 };
 
+const removeRoute = (ac) => {
+    const id = ac.hex;
+    if (routeLines.has(id)) {
+        routeLayer.removeLayer(routeLines.get(id));
+        routeLines.delete(id);
+    }
+}
+
 const drawRoute = (ac, routeInfo) => {
     const id = ac.hex;
 
@@ -274,7 +282,8 @@ const drawRoute = (ac, routeInfo) => {
 
     if (!routeInfo?._airports || routeInfo._airports.length < 2) return;
 
-    const coords = routeInfo._airports.map(a => [a.lat, a.lon]);
+    // Leaflet expects an array of coord pairs
+    const coords = [[ac.lat, ac.lon], [routeInfo._airports[1].lat, routeInfo._airports[1].lon]];
 
     const line = L.polyline(coords, {
         color: getAltitudeColor(ac.alt_baro),
@@ -306,7 +315,7 @@ const renderAircraft = async () => {
         seen.add(id);
 
         const inView = bounds.contains([ac.lat, ac.lon]);
-        const existing = aircraftMarkers.get(id);
+        const existingMarker = aircraftMarkers.get(id);
         const routeInfo = callsign ? routeCache.get(callsign) : null;
 
         if (inView) {
@@ -315,29 +324,22 @@ const renderAircraft = async () => {
             const type = ac.t || null;
             const category = ac.category || null;
 
-            if (existing) {
-                existing.setLatLng([ac.lat, ac.lon]);
-                existing.setIcon(createAircraftIcon(heading, altitude, type, category));
-                existing.setPopupContent(formatAircraftPopup(ac, routeInfo));
+            if (existingMarker) {
+                existingMarker.setLatLng([ac.lat, ac.lon]);
+                existingMarker.setIcon(createAircraftIcon(heading, altitude, type, category));
+                existingMarker.setPopupContent(formatAircraftPopup(ac, routeInfo));
             } else {
                 const marker = L.marker([ac.lat, ac.lon], {
                     icon: createAircraftIcon(heading, altitude, type, category),
                     zIndexOffset: 1000
                 }).bindPopup(formatAircraftPopup(ac, routeInfo));
 
-                marker.on('click', () => if (routeLinesEnabled) drawRoute(ac, routeInfo));
-
                 aircraftLayer.addLayer(marker);
                 aircraftMarkers.set(id, marker);
             }
-        } else if (existing) {
-            aircraftLayer.removeLayer(existing);
+        } else if (existingMarker) {
+            aircraftLayer.removeLayer(existingMarker);
             aircraftMarkers.delete(id);
-
-            if (routeLines.has(id)) {
-                routeLayer.removeLayer(routeLines.get(id));
-                routeLines.delete(id);
-            }
         }
     }
 
