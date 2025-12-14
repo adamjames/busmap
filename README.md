@@ -38,7 +38,9 @@ You may want to set a Cap key, to limit use of your BODS API key:
 ```
 ### OSRM (Optional)
 You may want an OSRM instance, for routing. First you need to preprocess the map data (one-time, ~30min for UK).
-````yaml
+Make a `docker-compose.yml` file:
+
+```yaml
  # You will want this *not* on an RPi, at least not yet.
  osrm:
    image: osrm/osrm-backend
@@ -49,14 +51,31 @@ You may want an OSRM instance, for routing. First you need to preprocess the map
    volumes:
      - osrm-data:/data
    command: osrm-routed --algorithm mld /data/great-britain-latest.osrm
-````
+```
+Then, alongside that file, make a folder and prepare the container:
+
 `mkdir -p osrm-data && cd osrm-data`
+
 `wget https://download.geofabrik.de/europe/great-britain-latest.osm.pbf`
+
 `docker run -t -v $(pwd):/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/great-britain-latest.osm.pbf`
+
 `docker run -t -v $(pwd):/data osrm/osrm-backend osrm-partition /data/great-britain-latest.osrm`
+
 `docker run -t -v $(pwd):/data osrm/osrm-backend osrm-customize /data/great-britain-latest.osrm`
 
-In `docker-compose.yml`, `extra-hosts` needs `mitre:10.0.0.120` swapping to wherever you are hosting OSRM,
+`docker compose up -d` should now start the container.
+
+To test it:
+`curl localhost:5001/5001/route/v1/driving/-0.0877,51.5079;-0.0900,51.5100?geometries=geojson"`
+
+Should give you something like:
+```json 
+{"code":"Ok","routes":[{"geometry":{"coordinates":[[-0.087641,51.507892],[-0.088322,51.506128],[-0.089951,51.504807],...
+```
+
+In the primary `docker-compose.yml`, `extra-hosts` needs `mitre:10.0.0.120` swapping to wherever you are hosting OSRM,
+to allow the container to communicate with it.
 
 ### Environment
 Now, set up the variables in .env.example (as .env)
