@@ -64,7 +64,7 @@ Feel free to contact me if needed.
 | Cap Standalone | CAPTCHA Engine (Back-end) | Apache-2.0 | [Docs](https://capjs.js.org/guide/standalone/) / [Github](https://github.com/tiagozip/cap) |
 | Tailscale | VPN Service | Mixed (Client: BSD 3-Clause, Service: Commercial) | [Open Source](https://tailscale.com/opensource) / [Client](https://github.com/tailscale/tailscale) |
 | tar1090 | Aircraft Tracking Visualisation | GPL v2 or later | [Github](https://github.com/wiedehopf/tar1090) |
-| ADS-B.im | Probably the easiest turnkey RTLSDR-ADSB feeder around | - | [Website](https://globe.adsb.im/) |
+| ADS-B.im | Probably the easiest turnkey RTLSDR-ADSB feeder around | Community Project | [Website](https://globe.adsb.im/) |
 | ADS-B.lol | Provide a great REST API to contributors | Community Project | [Website](https://adsb.lol/) |
 | SDR Enthusiasts Ultrafeeder | ADS-B Data Collection & Feeding | GPL-3.0 | [Github](https://github.com/sdr-enthusiasts/docker-adsb-ultrafeeder) |
 
