@@ -1,15 +1,9 @@
 # Bus Tracker
 
 This project uses data from the United Kingdom Government's [Bus Open Data Service (BODS)](https://data.bus-data.dft.gov.uk/)
-to produce a near real-time map. The content of the earliest commit was outlined over a 
-couple of sleepless weekends in December of 2015, and Claude was used heavily early on. I 
-was asked by some friends to publish the code after the early demos, so I've reluctantly 
-done so in spite of it being a bit of a fever dream. A few days work went in to polish, 
-but there are still some rough edges. Caveat emptor.
+to produce a near real-time map. 
 
-My intent now is to improve on what exists by hand - I've seen what happens when Claude 
-is asked to "improve" things. You'll need a BODS API Key. Register for one at 
-[https://data.bus-data.dft.gov.uk/account/signup/](https://data.bus-data.dft.gov.uk/account/signup/)
+![A screenshot at ground level, showing buses](./media/screenshot-ground.jpg)
 
 ## Features
 - Near-real time bus map covering the UK.
@@ -23,8 +17,71 @@ is asked to "improve" things. You'll need a BODS API Key. Register for one at
 - Optional live aircraft overlay (you'll need a source of ADSB data)
 - Distinct icons courtesy of tar1090, and aircraft route data from ADSB.lol
 
-# Licence, attributions & thanks
+## Can I use it?
+Sure! 
+- You'll need a BODS API Key. Register for one at [https://data.bus-data.dft.gov.uk/account/signup/](https://data.bus-data.dft.gov.uk/account/signup/).
+- You may want a Tailscale API key, which you can create in your admin panel. Make sure it's good for repeated use.
 
+### Cap Captcha
+You may want to set a Cap key, to limit use of your BODS API key: 
+1. Launch in docker with `docker compose --profile public up -d --build`
+2. Open http://localhost:3000 in browser
+3. Log in with the admin key (default: `changeme`, or whatever you set `CAP_ADMIN_KEY` to in `.env`)
+4. Click "Create Site Key" in the dashboard
+5. Copy the **Key ID** and **Secret** it generates
+6. Add to `.env`:
+```
+   CAP_KEY_ID=<the key id>
+   CAP_KEY_SECRET=<the secret>
+   CAP_URL=http://cap:3000
+   CAP_PUBLIC_URL=http://<your-tailscale-hostname>:3000 
+```
+### OSRM (Optional)
+You may want an OSRM instance, for routing. First you need to preprocess the map data (one-time, ~30min for UK).
+````yaml
+ # You will want this *not* on an RPi, at least not yet.
+ osrm:
+   image: osrm/osrm-backend
+   container_name: osrm
+   restart: unless-stopped
+   ports:
+     - "5001:5000"
+   volumes:
+     - osrm-data:/data
+   command: osrm-routed --algorithm mld /data/great-britain-latest.osrm
+````
+`mkdir -p osrm-data && cd osrm-data`
+`wget https://download.geofabrik.de/europe/great-britain-latest.osm.pbf`
+`docker run -t -v $(pwd):/data osrm/osrm-backend osrm-extract -p /opt/car.lua /data/great-britain-latest.osm.pbf`
+`docker run -t -v $(pwd):/data osrm/osrm-backend osrm-partition /data/great-britain-latest.osrm`
+`docker run -t -v $(pwd):/data osrm/osrm-backend osrm-customize /data/great-britain-latest.osrm`
+
+In `docker-compose.yml`, `extra-hosts` needs `mitre:10.0.0.120` swapping to wherever you are hosting OSRM,
+
+### Environment
+Now, set up the variables in .env.example (as .env)
+
+### Run
+Launch in Docker with `docker compose up -d --build` for local access only,
+or `docker compose --profile public up -d --build` to include Tailscale and Cap
+for public access.
+
+# How? Why?
+I'm just a sucker for visualising real-time data that reflects the real world.
+I've long thought about it, but finally put some time in to make a cool thing, I guess!
+
+The content of the earliest commit was outlined over a couple of sleepless weekends 
+in December of 2015, and Claude was used heavily early on. 
+
+I was asked by some friends to publish the code after early demos, so I've reluctantly 
+done so in spite of it being a bit of an AI fever dream. My intent now is to improve on what 
+exists by hand - I've seen what happens when Claude is asked to "improve" things. 
+Way too much boilerplate. Unlike that early software, this was written entirely manually. <3
+
+A few days work has already gone into polish, and a few hours into prepping this for release.
+There are still plenty of rough edges, though. Caveat emptor. 
+
+# Licence, attributions & thanks
 This "weekend" project was only possible because others are solving harder problems 
 and choosing to  publish their software under open licences.
 
@@ -45,8 +102,7 @@ This project is hereby licenced under the GPLv3, the full text of which can be f
 Relevant licence information has been collated below on a best-effort basis.
 Feel free to contact me if needed.
 
-# Third-party projects & Commercial services
-
+# Third-party projects & commercial services
 | Name | Service Type | Licence | Licence URL |
 |------|-------------|---------|------------|
 | OpenStreetMap Routing Machine (OSRM) | Routing Engine | BSD 2-Clause | [Link](https://github.com/Project-OSRM/osrm-backend) / [Image](https://github.com/project-osrm/osrm-backend/pkgs/container/osrm-backend) |
@@ -59,7 +115,6 @@ Feel free to contact me if needed.
 
 # Software dependencies
 ## Python
-
 | Name | Version | Licence | Licence URL |
 |------|---------|--------|------------|
 | defusedxml | 0.7.1 | Python Software Foundation Licence | [Link](https://docs.python.org/3/license.html) |
@@ -68,7 +123,6 @@ Feel free to contact me if needed.
 | requests | 2.32.5 | Apache-2.0 | [Link](https://www.apache.org/licenses/LICENSE-2.0) |
 
 ## JavaScript
-
 | Name | Version | Licence | Licence URL |
 |------|---------|--------|------------|
 | Leaflet | 1.9.4 | BSD 2-Clause | [Link](https://github.com/Leaflet/Leaflet/blob/main/LICENSE) |
