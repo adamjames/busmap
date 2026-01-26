@@ -5,8 +5,8 @@ import { initMap, getMap, renderVehicles, isAnimating, setCurrentBounds, setCurr
 import { initRouting } from './routing.js';
 import { initAircraft, toggleAircraft, isAircraftEnabled, setAircraftEnabled } from './aircraft.js';
 
-let debounceTimer = null;
 let refreshInterval = null;
+let debounceTimer = null;
 
 let lastFetch = { time: 0, key: null };
 
@@ -127,12 +127,6 @@ const updateBuses = async (config, force = false) => {
     } finally {
         setLoading(false);
     }
-};
-
-const debouncedUpdate = (config) => {
-    const map = getMap();
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(() => updateBuses(config), DEBOUNCE_MS);
 };
 
 const startAutoRefresh = (config) => {
@@ -271,10 +265,14 @@ export const init = (config) => {
 
     ['moveend', 'zoomend'].forEach(evt => {
         map.on(evt, () => {
-           setCurrentBounds(map.getBounds());
-           setCurrentZoom(Math.floor(map.getZoom()));
-           debouncedUpdate(config);
-           updateVisibility();
+           clearTimeout(debounceTimer);
+           debounceTimer = setTimeout(() => {
+               setCurrentBounds(map.getBounds());
+               setCurrentZoom(Math.floor(map.getZoom()));
+               updateBuses(config);
+               startAutoRefresh(config);
+               updateVisibility();
+           }, DEBOUNCE_MS);
         });
     });
 
@@ -296,10 +294,11 @@ export const init = (config) => {
     document.getElementById('welcome-dismiss')?.addEventListener('click', () => {
         document.getElementById('welcome-modal').style.display = 'none';
         loadCapScript(config);
-         setCurrentBounds(map.getBounds());
-         setCurrentZoom(Math.floor(map.getZoom()));
-         debouncedUpdate(config);
-         updateVisibility();
+        setCurrentBounds(map.getBounds());
+        setCurrentZoom(Math.floor(map.getZoom()));
+        updateBuses(config);
+        startAutoRefresh(config);
+        updateVisibility();
     });
 
     document.getElementById('refresh-btn')?.addEventListener('click', () => updateBuses(config));
