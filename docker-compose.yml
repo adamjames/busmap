@@ -33,8 +33,8 @@ services:
     environment:
       - TS_AUTHKEY=${TS_AUTHKEY}
       - TS_STATE_DIR=/var/lib/tailscale
-#      - TS_EXTRA_ARGS=--advertise-tags=tag:container
       - TS_SERVE_CONFIG=/config/serve.json
+      - TS_EXTRA_ARGS=--advertise-tags=tag:docker
     volumes:
       - tailscale-state:/var/lib/tailscale
       - ./serve.json:/config/serve.json:ro
