@@ -173,10 +173,6 @@ body {
     overflow: hidden;
 }
 
-.info-panel.minimized {
-    height: 30px;
-}
-
 .info-panel.minimized > *:not(#top-panel-minimize) {
     display: none;
 }
