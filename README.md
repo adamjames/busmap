@@ -26,7 +26,7 @@ I'm just a sucker for visualising real-time data that reflects the real world.
 I've long thought about it, but finally put some time in to make a cool thing, I guess!
 
 The content of the earliest commit was outlined over a couple of sleepless weekends 
-in December of 2015, and Claude was used heavily early on. 
+in December of 2025, and Claude was used heavily early on. 
 
 I was asked by some friends to publish the code after early demos, so I've reluctantly 
 done so in spite of it being a bit of an AI fever dream. My intent now is to improve on what 
